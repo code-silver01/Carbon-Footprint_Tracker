@@ -51,7 +51,7 @@ export const Roadmaps: React.FC = () => {
       const stratResponse = await apiClient.get('/roadmaps/strategies');
       const strategyIds = stratResponse.data.strategies.slice(0, 3).map((s: any) => s.id);
       
-      const response = await apiClient.post('/roadmaps/generate', { strategyIds });
+      const response = await apiClient.post('/roadmaps', { strategyIds });
       setRoadmap(response.data);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to generate roadmap');
