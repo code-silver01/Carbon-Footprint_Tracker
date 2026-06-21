@@ -1,30 +1,28 @@
-/**
- * Application configuration — all settings derived from environment variables.
- * Centralized, validated on startup.
- */
+import { z } from 'zod';
+
+const envSchema = z.object({
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  PORT: z.string().default('3001'),
+  GOOGLE_CLOUD_PROJECT: z.string().default('carbonwise-dev'),
+  GEMINI_API_KEY: z.string().optional(),
+  JWT_SECRET: z.string().min(32).default('dev-jwt-secret-change-in-production-min32chars!!'),
+  JWT_REFRESH_SECRET: z.string().min(32).default('dev-refresh-secret-change-in-prod-min32chars!!'),
+  FRONTEND_URL: z.string().default('http://localhost:5173'),
+});
+
 export interface AppConfig {
   port: number;
   nodeEnv: 'development' | 'production' | 'test';
   logLevel: string;
-
-  // Google Cloud
   googleCloudProject: string;
   firestoreEmulatorHost: string | undefined;
-
-  // Auth
   jwtSecret: string;
   jwtRefreshSecret: string;
-  jwtExpiresIn: number; // seconds
-  jwtRefreshExpiresIn: number; // seconds
-
-  // Gemini
+  jwtExpiresIn: number;
+  jwtRefreshExpiresIn: number;
   geminiApiKey: string;
   geminiModel: string;
-
-  // CORS
   frontendUrl: string;
-
-  // Rate Limiting
   rateLimitWindowMs: number;
   rateLimitMax: number;
 }
@@ -33,10 +31,12 @@ function getEnvOrDefault(key: string, defaultValue: string): string {
   return process.env[key] ?? defaultValue;
 }
 
-/**
- * Load and validate configuration from environment variables.
- */
 export function loadConfig(): AppConfig {
+  const parsed = envSchema.safeParse(process.env);
+  if (!parsed.success) {
+    console.warn('Environment variable validation warnings:', parsed.error.format());
+  }
+
   return {
     port: parseInt(getEnvOrDefault('PORT', '3001'), 10),
     nodeEnv: (getEnvOrDefault('NODE_ENV', 'development') as AppConfig['nodeEnv']),

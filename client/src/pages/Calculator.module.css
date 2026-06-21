@@ -1,0 +1,14 @@
+.calculatorContainer { max-width: 600px; margin: 0 auto; padding: 2rem; }
+.sectionTitle { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary); }
+.formGroup { margin-bottom: 1.5rem; display: flex; flex-direction: column; }
+.formGroup label { font-weight: 500; margin-bottom: 0.5rem; color: var(--text-secondary); }
+.formGroup input[type="number"] { padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-glass); color: var(--text-primary); }
+.required { color: #ef4444; margin-left: 0.25rem; }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+.errorMessage { color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem; }
+.errorAlert { background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; }
+.submitButton { width: 100%; margin-top: 1rem; }
+.radioGroup { display: flex; gap: 1rem; }
+.radioOption { display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); }
+fieldset { border: none; padding: 0; margin: 0 0 2rem 0; }
+small { color: var(--text-muted); margin-top: 0.25rem; }

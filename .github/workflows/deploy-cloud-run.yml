@@ -1,0 +1,52 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: us-central1
+  SERVICE_NAME: carbonwise-ai
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Configure Docker for Artifact Registry
+      run: |
+        gcloud auth configure-docker us-central1-docker.pkg.dev
+
+    - name: Build and push Docker image
+      run: |
+        docker build -t us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/carbonwise-repo/server:${{ github.sha }} \
+          -t us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/carbonwise-repo/server:latest \
+          ./server
+        docker push us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/carbonwise-repo/server:${{ github.sha }}
+        docker push us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/carbonwise-repo/server:latest
+
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy carbonwise-server \
+          --image us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/carbonwise-repo/server:latest \
+          --platform managed \
+          --region ${{ env.REGION }} \
+          --allow-unauthenticated \
+          --memory 512Mi \
+          --cpu 1 \
+          --timeout 60 \
+          --set-env-vars GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }} \
+          --set-env-vars NODE_ENV=production
