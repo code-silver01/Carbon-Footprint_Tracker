@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styles from './Calculator.module.css';
 import { Button } from '../components/common/Button';
+import { apiClient } from '../api/apiClient';
 
 interface CalculatorState {
   transportation: { carMiles: number; bikeMiles: number; transitMiles: number; flightHours: number; };
@@ -26,16 +27,7 @@ export const CarbonCalculator: React.FC = () => {
     setErrors({});
 
     try {
-      const response = await fetch('/api/footprints', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(state),
-      });
-
-      if (!response.ok) {
-        const { error } = await response.json();
-        throw new Error(error || 'Calculation failed');
-      }
+      const response = await apiClient.post('/footprints', state);
 
       const message = 'Carbon footprint calculated successfully';
       const announcement = document.createElement('div');

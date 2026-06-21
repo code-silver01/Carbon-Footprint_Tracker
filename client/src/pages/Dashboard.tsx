@@ -1,128 +1,68 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { LayoutDashboard, Leaf, LineChart, Target, LogOut, Settings } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import styles from './Dashboard.module.css';
+import { apiClient } from '../api/apiClient';
 
-const Dashboard: React.FC = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+interface MonthlyProgress { month: string; savings: number; }
+interface UserStats { currentMonth: number; cumulative: number; sustainabilityScore: number; rank: number; }
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+export const Dashboard: React.FC = () => {
+  const { user } = useAuth();
+  const [data, setData] = useState<MonthlyProgress[]>([]);
+  const [stats, setStats] = useState<UserStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await apiClient.get('/progress');
+        const progressData = response.data;
+        if (progressData) {
+          setData(progressData.monthlyData || []);
+          setStats({
+            currentMonth: progressData.currentMonth || 0,
+            cumulative: progressData.cumulative || 0,
+            sustainabilityScore: progressData.score || 0,
+            rank: progressData.rank || 0,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch progress data', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) return <div className={styles.loader} role="status" aria-live="polite">Loading...</div>;
 
   return (
-    <div className={styles.dashboardLayout}>
-      {/* Sidebar Navigation */}
-      <motion.aside 
-        className={`glass-panel ${styles.sidebar}`}
-        initial={{ x: -250 }}
-        animate={{ x: 0 }}
-        transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-      >
-        <div className={styles.logo}>
-          <Leaf className={styles.logoIcon} size={28} />
-          <h2>CarbonWise</h2>
-        </div>
+    <main className={styles.dashboard} role="main" aria-label="Progress dashboard">
+      <section className={styles.header}>
+        <h1>Welcome back, {user?.displayName || user?.email || 'User'}!</h1>
+        <p>Here's your sustainability progress.</p>
+      </section>
 
-        <nav className={styles.nav}>
-          <a href="#dashboard" className={`${styles.navItem} ${styles.active}`}>
-            <LayoutDashboard size={20} />
-            <span>Dashboard</span>
-          </a>
-          <a href="#calculate" className={styles.navItem}>
-            <Leaf size={20} />
-            <span>Calculate</span>
-          </a>
-          <a href="#roadmaps" className={styles.navItem}>
-            <Target size={20} />
-            <span>Roadmaps</span>
-          </a>
-          <a href="#history" className={styles.navItem}>
-            <LineChart size={20} />
-            <span>History</span>
-          </a>
-        </nav>
-
-        <div className={styles.sidebarFooter}>
-          <a href="#settings" className={styles.navItem}>
-            <Settings size={20} />
-            <span>Settings</span>
-          </a>
-          <button onClick={handleLogout} className={styles.logoutBtn}>
-            <LogOut size={20} />
-            <span>Logout</span>
-          </button>
-        </div>
-      </motion.aside>
-
-      {/* Main Content Area */}
-      <main className={styles.mainContent}>
-        <header className={styles.header}>
-          <div>
-            <h1 className={styles.greeting}>
-              Welcome back, {user?.displayName || user?.email?.split('@')[0] || 'User'}! 👋
-            </h1>
-            <p className={styles.subtitle}>Here is your sustainability overview for today.</p>
+      <section className={styles.metrics} aria-labelledby="metrics-heading">
+        <h2 id="metrics-heading">Your Progress</h2>
+        <div className={styles.metricGrid}>
+          <div className={styles.card} aria-label={`This month you saved ${stats?.currentMonth || 0} kilograms of CO2`}>
+            <h3>This Month's Savings</h3>
+            <p className={styles.value}>{stats?.currentMonth?.toFixed(1) || 0} kg CO₂</p>
           </div>
-          
-          <div className={styles.userProfile}>
-            <div className={styles.avatar}>
-              {user?.displayName ? user.displayName.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || 'U'}
-            </div>
+          <div className={styles.card} aria-label={`Total savings of ${stats?.cumulative || 0} kilograms of CO2`}>
+            <h3>Cumulative Savings</h3>
+            <p className={styles.value}>{stats?.cumulative?.toFixed(1) || 0} kg CO₂</p>
           </div>
-        </header>
-
-        {/* Placeholder for Dashboard Widgets */}
-        <div className={styles.widgetsGrid}>
-          <motion.div 
-            className={`glass-panel ${styles.widget} ${styles.scoreWidget}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
+          <div className={styles.card} aria-label={`Your sustainability score is ${stats?.sustainabilityScore || 0} out of 100`}>
             <h3>Sustainability Score</h3>
-            <div className={styles.scoreCircle}>
-              <span className={styles.scoreNumber}>85</span>
-              <span className={styles.scoreLabel}>/ 100</span>
-            </div>
-            <p className={styles.trendText}>↑ 5% from last month</p>
-          </motion.div>
-
-          <motion.div 
-            className={`glass-panel ${styles.widget}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <h3>Monthly Savings</h3>
-            <div className={styles.statValue}>124 kg CO₂</div>
-            <p className={styles.trendText}>Keep up the good work!</p>
-          </motion.div>
-
-          <motion.div 
-            className={`glass-panel ${styles.widget} ${styles.wideWidget}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <h3>Active Milestone</h3>
-            <div className={styles.milestoneContent}>
-              <div className={styles.milestoneIcon}><Target size={24} /></div>
-              <div className={styles.milestoneText}>
-                <h4>Meatless Mondays</h4>
-                <p>2 weeks remaining • Est. savings: 15 kg CO₂</p>
-              </div>
-              <button className={styles.actionBtn}>View Details</button>
-            </div>
-          </motion.div>
+            <p className={styles.value}>{stats?.sustainabilityScore || 0}/100</p>
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+    </main>
   );
 };
-
 export default Dashboard;
