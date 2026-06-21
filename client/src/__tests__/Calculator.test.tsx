@@ -1,9 +1,12 @@
+// @vitest-environment jsdom
 
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CarbonCalculator } from '../pages/Calculator';
-import '@testing-library/jest-dom';
-import { describe, it, expect, vi } from 'vitest';
+import '@testing-library/jest-dom/vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+
+afterEach(cleanup);
 
 describe('CarbonCalculator Accessibility', () => {
   it('should render with proper semantic structure', () => {

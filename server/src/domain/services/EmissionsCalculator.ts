@@ -16,8 +16,12 @@ export class EmissionsCalculator {
   constructor(private readonly emissionsRepository: IEmissionsRepository) {}
 
   /**
-   * Calculate total emissions from a complete footprint input.
-   * Returns breakdown by category and total in kg CO2.
+   * Calculates the detailed carbon footprint based on user inputs across multiple categories.
+   * Processes transportation, energy, diet, and shopping habits to provide an aggregate
+   * total and a category-by-category breakdown.
+   *
+   * @param input - The complete footprint input data provided by the user.
+   * @returns A promise that resolves to an object containing the detailed emission breakdown and the total footprint in kg CO2.
    */
   async calculateTotal(input: FootprintInput): Promise<{
     breakdown: EmissionBreakdown;

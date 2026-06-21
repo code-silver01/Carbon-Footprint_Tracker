@@ -32,6 +32,15 @@ export interface IStrategyAllocator {
  * ```
  */
 export class StrategyAllocator implements IStrategyAllocator {
+  /**
+   * Distributes strategies evenly across milestones using a progressive difficulty model.
+   * Sorts the provided strategies by difficulty (ascending) and distributes them round-robin,
+   * ensuring that earlier milestones receive easier strategies and later milestones receive harder ones.
+   *
+   * @param strategies - An array of Strategy objects to be distributed.
+   * @param milestoneCount - The total number of milestones to distribute the strategies across.
+   * @returns A 2D array where each inner array contains the strategy IDs assigned to the corresponding milestone.
+   */
   allocateStrategies(strategies: Strategy[], milestoneCount: number): string[][] {
     if (milestoneCount === 0 || strategies.length === 0) {
       return Array.from({ length: milestoneCount }, () => []);

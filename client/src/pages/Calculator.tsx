@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styles from './Calculator.module.css';
 import { Button } from '../components/common/Button';
 import { apiClient } from '../api/apiClient';
+import { useFocusManagement } from '../hooks/useFocusManagement';
 
 interface CalculatorState {
   transportation: { carMiles: number; bikeMiles: number; transitMiles: number; flightHours: number; };
@@ -20,9 +21,11 @@ export const CarbonCalculator: React.FC = () => {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const { saveFocus, restoreFocus } = useFocusManagement();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    saveFocus();
     setLoading(true);
     setErrors({});
 
@@ -47,6 +50,7 @@ export const CarbonCalculator: React.FC = () => {
       }
     } finally {
       setLoading(false);
+      restoreFocus();
     }
   };
 
@@ -73,9 +77,10 @@ export const CarbonCalculator: React.FC = () => {
               aria-describedby="carMiles-help"
               aria-invalid={!!errors.carMiles}
               aria-errormessage={errors.carMiles ? 'carMiles-error' : undefined}
+              aria-required="true"
             />
             <small id="carMiles-help">Average monthly car travel distance in miles.</small>
-            {errors.carMiles && <span id="carMiles-error" role="alert" className={styles.errorMessage}>{errors.carMiles}</span>}
+            {errors.carMiles && <span id="carMiles-error" role="alert" aria-live="polite" className={styles.errorMessage}>{errors.carMiles}</span>}
           </div>
         </fieldset>
 
@@ -94,8 +99,12 @@ export const CarbonCalculator: React.FC = () => {
               value={state.energy.electricityKwh}
               onChange={(e) => setState({ ...state, energy: { ...state.energy, electricityKwh: parseFloat(e.target.value) } })}
               aria-describedby="electricityKwh-help"
+              aria-invalid={!!errors.electricityKwh}
+              aria-errormessage={errors.electricityKwh ? 'electricityKwh-error' : undefined}
+              aria-required="true"
             />
             <small id="electricityKwh-help">Your total electricity consumption per month.</small>
+            {errors.electricityKwh && <span id="electricityKwh-error" role="alert" aria-live="polite" className={styles.errorMessage}>{errors.electricityKwh}</span>}
           </div>
           <div className={styles.formGroup}>
             <label htmlFor="renewablePercentage">
@@ -113,8 +122,12 @@ export const CarbonCalculator: React.FC = () => {
               aria-valuemax={100}
               aria-valuenow={state.energy.renewablePercentage}
               aria-describedby="renewable-help"
+              aria-invalid={!!errors.renewablePercentage}
+              aria-errormessage={errors.renewablePercentage ? 'renewablePercentage-error' : undefined}
+              aria-required="true"
             />
             <small id="renewable-help">Percentage of your electricity from renewable sources ({state.energy.renewablePercentage}%)</small>
+            {errors.renewablePercentage && <span id="renewablePercentage-error" role="alert" aria-live="polite" className={styles.errorMessage}>{errors.renewablePercentage}</span>}
           </div>
         </fieldset>
 

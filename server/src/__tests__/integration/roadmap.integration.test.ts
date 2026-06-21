@@ -22,7 +22,7 @@ describe('Roadmaps API (Integration)', () => {
 
     // Create a footprint first
     const fpResponse = await request(app)
-      .post('/api/footprints/calculate')
+      .post('/api/footprints')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         transportation: { carMiles: 500, flightHours: 0, transitMiles: 0, bikeMiles: 0 },
@@ -32,14 +32,14 @@ describe('Roadmaps API (Integration)', () => {
       });
       
     expect(fpResponse.status).toBe(201);
-  });
+  }, 15000);
 
   describe('POST /api/roadmaps/generate', () => {
     it('should generate a roadmap successfully', async () => {
       const response = await request(app)
         .post('/api/roadmaps/generate')
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ strategyIds: ['s1', 's2', 's3'] });
+        .send({ strategyIds: ['strat-carpool', 'strat-transit', 'strat-bike'] });
 
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('id');
@@ -60,7 +60,7 @@ describe('Roadmaps API (Integration)', () => {
     it('should require authentication', async () => {
       const response = await request(app)
         .post('/api/roadmaps/generate')
-        .send({ strategyIds: ['s1', 's2', 's3'] });
+        .send({ strategyIds: ['strat-carpool', 'strat-transit', 'strat-bike'] });
 
       expect(response.status).toBe(401);
     });

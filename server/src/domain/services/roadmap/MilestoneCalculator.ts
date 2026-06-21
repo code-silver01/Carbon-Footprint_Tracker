@@ -1,5 +1,7 @@
 import { DifficultyLevel, MilestoneProps } from '../../value-objects/Milestone';
 
+const COST_PER_KG_CO2 = 0.14;
+
 /**
  * Period configuration for milestone calculation.
  * Each period defines a time range, the fraction of total reduction to target,
@@ -56,9 +58,16 @@ export class MilestoneCalculator implements IMilestoneCalculator {
     { dayRange: [91, 365] as [number, number], reductionFraction: 1.0, difficulty: 4 as DifficultyLevel },
   ]);
 
-  /** Cost-of-carbon factor: estimated monetary savings per kg CO₂ reduced */
-  private static readonly SAVINGS_PER_KG = 0.14;
 
+
+  /**
+   * Calculates progressive milestone checkpoints for a carbon reduction roadmap.
+   * Distributes the total achievable reduction across predefined time periods (e.g., 30/90/365 days),
+   * applying increasing difficulty and estimating monetary savings per milestone.
+   *
+   * @param totalReduction - The total achievable CO₂ reduction in kg.
+   * @returns An array of MilestoneProps objects representing each milestone checkpoint.
+   */
   calculateMilestones(totalReduction: number): MilestoneProps[] {
     return MilestoneCalculator.PERIODS.map((period, index) => {
       const reduction = totalReduction * period.reductionFraction;
@@ -67,7 +76,7 @@ export class MilestoneCalculator implements IMilestoneCalculator {
         id: `milestone-${index + 1}`,
         dayRange: period.dayRange,
         targetReduction: Math.round(reduction * 100) / 100,
-        estimatedSavings: Math.round(reduction * MilestoneCalculator.SAVINGS_PER_KG * 100) / 100,
+        estimatedSavings: Math.round(reduction * COST_PER_KG_CO2 * 100) / 100,
         difficulty: period.difficulty,
         strategies: [], // Populated by StrategyAllocator
         status: 'pending' as const,
