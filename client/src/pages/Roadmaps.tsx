@@ -1,39 +1,43 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Route, Play, CheckCircle, Clock, Map } from 'lucide-react';
+import { Route, Map, CheckCircle2, Circle, Clock, ArrowRight } from 'lucide-react';
 import { apiClient } from '../api/apiClient';
-import { Button } from '../components/common/Button';
 import styles from './Roadmaps.module.css';
 
-interface Milestone {
+interface Strategy {
   id: string;
   title: string;
   description: string;
-  targetDate: string;
+  estimatedMonthlySavings: number;
+}
+
+interface Milestone {
+  id: string;
+  targetReduction: number;
+  dayRange: [number, number];
   status: 'pending' | 'in_progress' | 'completed' | 'skipped';
+  strategies: Strategy[];
 }
 
 interface Roadmap {
   id: string;
-  userId: string;
-  status: 'active' | 'completed' | 'abandoned';
   milestones: Milestone[];
-  createdAt: string;
 }
 
-export const Roadmaps: React.FC = () => {
+const Roadmaps: React.FC = () => {
   const [roadmap, setRoadmap] = useState<Roadmap | null>(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchRoadmap = async () => {
+  const fetchActiveRoadmap = async () => {
     try {
+      setLoading(true);
       const response = await apiClient.get('/roadmaps/active');
       setRoadmap(response.data);
     } catch (err: any) {
       if (err.response?.status !== 404) {
-        setError('Failed to fetch active roadmap');
+        setError('Failed to load roadmap.');
       }
     } finally {
       setLoading(false);
@@ -41,20 +45,20 @@ export const Roadmaps: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchRoadmap();
+    fetchActiveRoadmap();
   }, []);
 
   const generateRoadmap = async () => {
-    setGenerating(true);
     try {
-      // In a real app we'd let them select strategies, but for now we'll fetch available ones
-      const stratResponse = await apiClient.get('/roadmaps/strategies');
-      const strategyIds = stratResponse.data.strategies.slice(0, 3).map((s: any) => s.id);
-      
-      const response = await apiClient.post('/roadmaps', { strategyIds });
+      setGenerating(true);
+      // Let backend select default strategies for now based on user footprint
+      // If endpoint requires strategyIds, we pass some defaults or backend logic handles it
+      const response = await apiClient.post('/roadmaps/generate', {
+        strategyIds: ['s1', 's2', 's3', 's4', 's5', 's6'] // Mock default selection, in real app would be chosen via UI
+      });
       setRoadmap(response.data);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to generate roadmap');
+      setError(err.response?.data?.error || 'Failed to generate roadmap.');
     } finally {
       setGenerating(false);
     }
@@ -64,87 +68,133 @@ export const Roadmaps: React.FC = () => {
     if (!roadmap) return;
     try {
       await apiClient.patch(`/roadmaps/${roadmap.id}/milestones/${milestoneId}`, { status });
-      // Optimistically update
-      setRoadmap(prev => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          milestones: prev.milestones.map(m => m.id === milestoneId ? { ...m, status: status as any } : m)
-        };
+      // Optimistic update
+      setRoadmap({
+        ...roadmap,
+        milestones: roadmap.milestones.map(m => 
+          m.id === milestoneId ? { ...m, status: status as any } : m
+        )
       });
     } catch (err) {
-      console.error('Failed to update milestone', err);
+      console.error('Failed to update milestone status');
     }
   };
 
-  if (loading) return <div className={styles.loader}>Loading your sustainability journey...</div>;
-
-  if (!roadmap) {
+  if (loading) {
     return (
-      <main className={styles.container}>
-        <div className={styles.emptyState}>
-          <Map size={64} className={styles.emptyIcon} />
-          <h2>No Active Roadmap</h2>
-          <p>Commit to a personalized 30, 90, or 365-day journey to reduce your emissions.</p>
-          <Button onClick={generateRoadmap} disabled={generating}>
-            {generating ? 'Plotting Route...' : 'Generate New Roadmap'}
-          </Button>
-          {error && <p className={styles.errorText}>{error}</p>}
-        </div>
-      </main>
+      <div className={styles.centerContainer}>
+        <div className={styles.spinner}></div>
+        <p>Loading your roadmap...</p>
+      </div>
     );
   }
 
+  if (error) {
+    return (
+      <div className={styles.centerContainer}>
+        <div className="glass-panel">
+          <p className={styles.errorText}>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!roadmap) {
+    return (
+      <div className={styles.emptyContainer}>
+        <motion.div 
+          className={`glass-panel ${styles.emptyCard}`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Map size={48} className={styles.emptyIcon} />
+          <h2>No Active Roadmap</h2>
+          <p>Generate a personalized 30/90/365-day roadmap to start reducing your emissions systematically.</p>
+          <button 
+            className={styles.generateBtn}
+            onClick={generateRoadmap}
+            disabled={generating}
+          >
+            {generating ? 'Generating...' : 'Generate Roadmap'}
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'completed': return <CheckCircle2 className={styles.statusCompleted} />;
+      case 'in_progress': return <Clock className={styles.statusInProgress} />;
+      default: return <Circle className={styles.statusPending} />;
+    }
+  };
+
   return (
-    <main className={styles.container}>
+    <div className={styles.container}>
       <header className={styles.header}>
         <div className={styles.titleWrapper}>
-          <Route className={styles.icon} size={32} />
+          <Route size={32} className={styles.headerIcon} />
           <h1>Your Progressive Roadmap</h1>
         </div>
-        <p>Stay on track with your reduction milestones. You got this!</p>
+        <p>Follow these milestones to steadily reach net zero.</p>
       </header>
 
       <div className={styles.timeline}>
         {roadmap.milestones.map((milestone, idx) => (
           <motion.div 
-            key={milestone.id} 
-            className={styles.timelineItem}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.15 }}
+            key={milestone.id}
+            className={styles.milestoneNode}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: idx * 0.2 }}
           >
-            <div className={`${styles.statusIndicator} ${styles[milestone.status]}`}>
-              {milestone.status === 'completed' && <CheckCircle size={20} />}
-              {milestone.status === 'in_progress' && <Play size={20} />}
-              {milestone.status === 'pending' && <Clock size={20} />}
-              {milestone.status === 'skipped' && <Clock size={20} />}
-            </div>
-            
-            <div className={styles.milestoneContent}>
-              <div className={styles.milestoneHeader}>
-                <h3>{milestone.title}</h3>
-                <span className={styles.targetDate}>Due: {new Date(milestone.targetDate).toLocaleDateString()}</span>
+            <div className={styles.timelineLine}>
+              <div className={styles.iconContainer}>
+                {getStatusIcon(milestone.status)}
               </div>
-              <p>{milestone.description}</p>
-              
-              <div className={styles.actions}>
-                {milestone.status !== 'completed' && (
-                  <button onClick={() => updateMilestone(milestone.id, 'completed')} className={styles.completeBtn}>
-                    Mark Completed
-                  </button>
-                )}
-                {milestone.status === 'pending' && (
-                  <button onClick={() => updateMilestone(milestone.id, 'in_progress')} className={styles.startBtn}>
-                    Start Working
-                  </button>
-                )}
+              {idx !== roadmap.milestones.length - 1 && (
+                <div className={`${styles.line} ${milestone.status === 'completed' ? styles.lineCompleted : ''}`}></div>
+              )}
+            </div>
+
+            <div className={`glass-panel ${styles.milestoneCard} ${styles[milestone.status]}`}>
+              <div className={styles.milestoneHeader}>
+                <div>
+                  <h3>Days {milestone.dayRange[0]} - {milestone.dayRange[1]}</h3>
+                  <span className={styles.targetBadge}>
+                    Target: {milestone.targetReduction.toFixed(1)} kg CO₂
+                  </span>
+                </div>
+                
+                <div className={styles.actions}>
+                  {milestone.status === 'pending' && (
+                    <button onClick={() => updateMilestone(milestone.id, 'in_progress')}>
+                      Start <ArrowRight size={16} />
+                    </button>
+                  )}
+                  {milestone.status === 'in_progress' && (
+                    <button onClick={() => updateMilestone(milestone.id, 'completed')} className={styles.completeBtn}>
+                      Mark Complete
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className={styles.strategiesGrid}>
+                {milestone.strategies.map(strategy => (
+                  <div key={strategy.id} className={styles.strategyItem}>
+                    <h4>{strategy.title}</h4>
+                    <p>{strategy.description}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </motion.div>
         ))}
       </div>
-    </main>
+    </div>
   );
 };
+
 export default Roadmaps;

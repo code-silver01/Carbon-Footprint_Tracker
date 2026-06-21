@@ -1,59 +1,69 @@
 import React from 'react';
-import { Trophy, TrendingUp, Users } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Trophy, Users, TrendingUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import styles from './LeaderboardCard.module.css';
 
-interface LeaderboardProps {
-  rank: number;
-  score: number;
+interface LeaderboardCardProps {
+  rank: string; // e.g., "Top 10%" or "Newcomer"
+  sustainabilityScore: number; // 0-100
 }
 
-export const LeaderboardCard: React.FC<LeaderboardProps> = ({ rank, score }) => {
-  // Mock total users for percentile calculation (in a real app this comes from backend)
-  const totalUsers = 15420;
-  const percentile = Math.max(1, Math.round((rank / totalUsers) * 100));
+const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ rank, sustainabilityScore }) => {
   
+  // Calculate relative fill percentage for the progress bar
+  const scorePercent = Math.min(Math.max(sustainabilityScore, 0), 100);
+
   return (
-    <div className={styles.card}>
+    <motion.div 
+      className={`glass-panel ${styles.card}`}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+    >
       <div className={styles.header}>
-        <div className={styles.titleWrapper}>
+        <div className={styles.titleGroup}>
           <Trophy className={styles.icon} size={24} />
-          <h3>Community Standing</h3>
+          <h2>Community Standing</h2>
         </div>
-        <span className={styles.scoreBadge}>Score: {score}/100</span>
+        <div className={styles.badge}>{rank}</div>
       </div>
 
-      <div className={styles.statsContainer}>
-        <div className={styles.statBox}>
-          <span className={styles.statLabel}>Global Rank</span>
-          <span className={styles.statValue}>#{rank.toLocaleString()}</span>
+      <div className={styles.scoreContainer}>
+        <div className={styles.scoreLabel}>
+          <span>Sustainability Score</span>
+          <span className={styles.scoreValue}>{sustainabilityScore} / 100</span>
         </div>
-        <div className={styles.statBox}>
-          <span className={styles.statLabel}>Percentile</span>
-          <span className={styles.statValue}>Top {percentile}%</span>
+        
+        <div className={styles.progressBarBg}>
+          <motion.div 
+            className={styles.progressBarFill}
+            initial={{ width: 0 }}
+            animate={{ width: `${scorePercent}%` }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+          />
         </div>
       </div>
 
-      <div className={styles.progressSection}>
-        <div className={styles.progressLabels}>
-          <span>Novice</span>
-          <span>Eco-Warrior</span>
+      <div className={styles.statsGrid}>
+        <div className={styles.statItem}>
+          <Users size={16} className={styles.statIcon} />
+          <span>Anonymous Comparison</span>
         </div>
-        <div className={styles.progressBar}>
-          <div className={styles.progressFill} style={{ width: `${Math.max(5, 100 - percentile)}%` }}></div>
+        <div className={styles.statItem}>
+          <TrendingUp size={16} className={styles.statIcon} />
+          <span>Top performers reduce 30% more</span>
         </div>
-        <p className={styles.insight}>
-          <TrendingUp size={16} />
-          You are more sustainable than {100 - percentile}% of our users!
-        </p>
       </div>
 
-      <div className={styles.actions}>
-        <NavLink to="/advisor" className={styles.actionBtn}>
-          <Users size={16} />
-          Get Advice to Rank Up
-        </NavLink>
+      <div className={styles.footer}>
+        <p>Boost your score by following tailored advice.</p>
+        <Link to="/advisor" className={styles.actionBtn}>
+          Get AI Advice
+        </Link>
       </div>
-    </div>
+    </motion.div>
   );
 };
+
+export default LeaderboardCard;

@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import styles from './Dashboard.module.css';
 import { apiClient } from '../api/apiClient';
 import { TrendChart } from '../components/Dashboard/TrendChart';
-import { LeaderboardCard } from '../components/Dashboard/LeaderboardCard';
+import LeaderboardCard from '../components/Dashboard/LeaderboardCard';
 
 
 interface UserStats { currentMonth: number; cumulative: number; sustainabilityScore: number; rank: number; }
@@ -69,7 +69,10 @@ export const Dashboard: React.FC = () => {
 
         <section className={styles.leaderboard} aria-labelledby="leaderboard-heading">
           <h2 id="leaderboard-heading" style={{ marginBottom: '1rem', fontSize: '1.5rem', fontWeight: 600 }}>Community Leaderboard</h2>
-          <LeaderboardCard rank={stats?.rank || 9999} score={stats?.sustainabilityScore || 0} />
+          <LeaderboardCard 
+            rank={stats?.rank && stats.rank <= 100 ? `Top ${stats.rank}%` : "Newcomer"} 
+            sustainabilityScore={stats?.sustainabilityScore || 0} 
+          />
         </section>
       </div>
     </main>

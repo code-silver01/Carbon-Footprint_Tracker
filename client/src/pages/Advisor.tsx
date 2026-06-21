@@ -1,108 +1,171 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Brain, Target, AlertTriangle } from 'lucide-react';
+import { Brain, Zap, Target, Leaf, Award } from 'lucide-react';
 import { apiClient } from '../api/apiClient';
 import styles from './Advisor.module.css';
 
-interface AdviceData {
-  advice: {
-    topSources: { source: string; percentage: number }[];
-    strategies: { id: string; title: string; description: string; impact: string; effort: string }[];
-    weeklyChallenge: { title: string; description: string };
-    generatedAt: string;
-  };
-  footprintSummary: { total: number; month: string };
+interface Recommendation {
+  id: string;
+  title: string;
+  description: string;
+  impact: 'High' | 'Medium' | 'Low';
+  category: string;
+  estimatedSavings: number;
 }
 
-export const Advisor: React.FC = () => {
-  const [data, setData] = useState<AdviceData | null>(null);
+interface Analysis {
+  highestEmissionSource: string;
+  insights: string[];
+}
+
+interface AdviceResponse {
+  analysis: Analysis;
+  recommendations: Recommendation[];
+  weeklyChallenge: {
+    title: string;
+    description: string;
+    rewardPoints: number;
+  };
+}
+
+const Advisor: React.FC = () => {
+  const [data, setData] = useState<AdviceResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAdvice = async () => {
       try {
-        const response = await apiClient.get('/advice/recommendations');
+        setLoading(true);
+        const response = await apiClient.post('/advice/recommendations');
         setData(response.data);
       } catch (err: any) {
-        setError(err.response?.data?.error || 'Failed to fetch recommendations');
+        setError(err.response?.data?.error || 'Failed to load AI recommendations.');
       } finally {
         setLoading(false);
       }
     };
+
     fetchAdvice();
   }, []);
 
-  if (loading) return <div className={styles.loader}>Analyzing your footprint with Gemini...</div>;
-  if (error) return <div className={styles.errorContainer}>{error}</div>;
-  if (!data) return null;
+  if (loading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+        >
+          <Brain size={48} className={styles.loadingIcon} />
+        </motion.div>
+        <p>Analyzing your footprint data with Gemini AI...</p>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className={styles.errorContainer}>
+        <div className="glass-panel">
+          <h2>Oops!</h2>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <main className={styles.container}>
+    <div className={styles.container}>
       <header className={styles.header}>
         <div className={styles.titleWrapper}>
-          <Brain className={styles.icon} size={32} />
+          <Brain size={32} className={styles.headerIcon} />
           <h1>AI Sustainability Advisor</h1>
         </div>
-        <p>Personalized strategies powered by Google Gemini based on your recent {data.footprintSummary.total.toFixed(1)} kg CO₂ footprint.</p>
+        <p>Powered by Gemini. Tailored strategies based on your latest footprint.</p>
       </header>
 
-      <div className={styles.grid}>
-        <section className={styles.sourcesColumn}>
-          <h2>Top Emission Sources</h2>
-          <div className={styles.sourceList}>
-            {data.advice.topSources.map((source, idx) => (
-              <motion.div 
-                key={idx} 
-                className={styles.sourceCard}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.1 }}
-              >
-                <AlertTriangle className={styles.warningIcon} size={20} />
-                <div className={styles.sourceInfo}>
-                  <span className={styles.sourceName}>{source.source}</span>
-                  <span className={styles.sourcePercent}>{source.percentage.toFixed(1)}%</span>
-                </div>
-                <div className={styles.progressBar}>
-                  <div className={styles.progressFill} style={{ width: `${source.percentage}%` }}></div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
+      <div className={styles.splitLayout}>
+        {/* Left Column: Analysis & Insights */}
+        <div className={styles.leftColumn}>
+          <motion.div 
+            className={`glass-panel ${styles.analysisCard}`}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h3><Zap size={20} /> AI Analysis</h3>
+            <div className={styles.highlight}>
+              <span>Highest Emission Source:</span>
+              <strong>{data.analysis.highestEmissionSource}</strong>
+            </div>
+            
+            <ul className={styles.insightsList}>
+              {data.analysis.insights.map((insight, idx) => (
+                <li key={idx}>
+                  <Leaf size={16} />
+                  <span>{insight}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
 
-        <section className={styles.strategiesColumn}>
-          <div className={styles.challengeCard}>
-            <h3><Target size={20} /> Weekly Challenge</h3>
-            <h4>{data.advice.weeklyChallenge.title}</h4>
-            <p>{data.advice.weeklyChallenge.description}</p>
-          </div>
+          <motion.div 
+            className={`glass-panel ${styles.challengeCard}`}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <h3><Award size={20} /> Weekly Challenge</h3>
+            <div className={styles.challengeContent}>
+              <h4>{data.weeklyChallenge.title}</h4>
+              <p>{data.weeklyChallenge.description}</p>
+              <div className={styles.reward}>
+                Reward: {data.weeklyChallenge.rewardPoints} pts
+              </div>
+            </div>
+          </motion.div>
+        </div>
 
-          <h2>Recommended Strategies</h2>
-          <div className={styles.strategyList}>
-            {data.advice.strategies.map((strategy, idx) => (
+        {/* Right Column: Recommendations */}
+        <div className={styles.rightColumn}>
+          <motion.h3 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className={styles.sectionTitle}
+          >
+            <Target size={20} /> Recommended Actions
+          </motion.h3>
+          
+          <div className={styles.recommendationsList}>
+            {data.recommendations.map((rec, idx) => (
               <motion.div 
-                key={strategy.id} 
-                className={styles.strategyCard}
+                key={rec.id}
+                className={`glass-panel ${styles.recCard}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + idx * 0.1 }}
+                transition={{ duration: 0.4, delay: 0.3 + idx * 0.1 }}
+                whileHover={{ scale: 1.02 }}
               >
-                <div className={styles.strategyHeader}>
-                  <h3>{strategy.title}</h3>
-                  <div className={styles.badges}>
-                    <span className={styles.impactBadge}>Impact: {strategy.impact}</span>
-                    <span className={styles.effortBadge}>Effort: {strategy.effort}</span>
-                  </div>
+                <div className={styles.recHeader}>
+                  <h4>{rec.title}</h4>
+                  <span className={`${styles.impactBadge} ${styles[rec.impact.toLowerCase()]}`}>
+                    {rec.impact} Impact
+                  </span>
                 </div>
-                <p>{strategy.description}</p>
+                <p>{rec.description}</p>
+                <div className={styles.recFooter}>
+                  <span className={styles.category}>{rec.category}</span>
+                  <span className={styles.savings}>
+                    Save ~${rec.estimatedSavings.toFixed(2)}/mo
+                  </span>
+                </div>
               </motion.div>
             ))}
           </div>
-        </section>
+        </div>
       </div>
-    </main>
+    </div>
   );
 };
+
 export default Advisor;

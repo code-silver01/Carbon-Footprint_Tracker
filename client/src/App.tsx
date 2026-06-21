@@ -9,8 +9,8 @@ import { Navbar } from './components/common/Navbar';
 const Login = React.lazy(() => import('./pages/Login'));
 const Dashboard = React.lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
 const Calculator = React.lazy(() => import('./pages/Calculator').then(m => ({ default: m.CarbonCalculator })));
-const Advisor = React.lazy(() => import('./pages/Advisor').then(m => ({ default: m.Advisor })));
-const Roadmaps = React.lazy(() => import('./pages/Roadmaps').then(m => ({ default: m.Roadmaps })));
+const Advisor = React.lazy(() => import('./pages/Advisor'));
+const Roadmaps = React.lazy(() => import('./pages/Roadmaps'));
 
 const ProtectedLayout: React.FC = () => (
   <>
