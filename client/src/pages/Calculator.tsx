@@ -38,8 +38,13 @@ export const CarbonCalculator: React.FC = () => {
       announcement.className = styles.srOnly;
       document.body.appendChild(announcement);
       setTimeout(() => announcement.remove(), 3000);
-    } catch (error) {
-      setErrors({ submit: error instanceof Error ? error.message : 'Unknown error' });
+    } catch (error: any) {
+      const data = error.response?.data;
+      if (data?.details && data.details.length > 0) {
+        setErrors({ submit: `${data.error}: ${data.details[0].message}` });
+      } else {
+        setErrors({ submit: data?.error || error.message || 'Unknown error' });
+      }
     } finally {
       setLoading(false);
     }

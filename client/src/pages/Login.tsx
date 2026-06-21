@@ -28,7 +28,12 @@ const Login: React.FC = () => {
       await login(accessToken, refreshToken);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Authentication failed');
+      const data = err.response?.data;
+      if (data?.details && data.details.length > 0) {
+        setError(`${data.error}: ${data.details[0].message}`);
+      } else {
+        setError(data?.error || 'Authentication failed');
+      }
     } finally {
       setLoading(false);
     }
