@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://carbonwise-server-1008084251997.us-central1.run.app/api';
 
 export const apiClient = axios.create({
   baseURL: API_URL,
