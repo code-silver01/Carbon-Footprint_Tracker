@@ -1,5 +1,5 @@
 import { IRoadmapRepository } from '../../repositories/IRoadmapRepository';
-import { Roadmap, Milestone, DifficultyLevel } from '../../value-objects/Milestone';
+import { Roadmap, Milestone } from '../../value-objects/Milestone';
 import { CarbonFootprint } from '../../entities/CarbonFootprint';
 import { ValidationError } from '../../errors';
 import { ILogger } from '../AuthService';

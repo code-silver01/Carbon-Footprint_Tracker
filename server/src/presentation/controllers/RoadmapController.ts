@@ -1,5 +1,5 @@
 import { Response, NextFunction } from 'express';
-import { RoadmapService } from '../../domain/services/RoadmapService';
+import { RoadmapService } from '../../domain/services/roadmap';
 import { IFootprintRepository } from '../../domain/repositories/IFootprintRepository';
 import { AuthenticatedRequest } from '../middleware/AuthMiddleware';
 

@@ -54,7 +54,7 @@ const Roadmaps: React.FC = () => {
       // Let backend select default strategies for now based on user footprint
       // If endpoint requires strategyIds, we pass some defaults or backend logic handles it
       const response = await apiClient.post('/roadmaps/generate', {
-        strategyIds: ['s1', 's2', 's3', 's4', 's5', 's6'] // Mock default selection, in real app would be chosen via UI
+        strategyIds: ['strat-carpool', 'strat-renewable', 'strat-plant-based', 'strat-efficiency', 'strat-slow-fashion', 'strat-reduce-buy'] // Default selection
       });
       setRoadmap(response.data);
     } catch (err: any) {

@@ -18,7 +18,7 @@ export class AppError extends Error {
 }
 
 export class ValidationError extends AppError {
-  public readonly code = 'VALIDATION_ERROR';
+  public readonly code: string = 'VALIDATION_ERROR';
   constructor(message: string) {
     super(message, 400);
   }

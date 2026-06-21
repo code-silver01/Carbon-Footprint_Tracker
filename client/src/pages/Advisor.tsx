@@ -38,7 +38,31 @@ const Advisor: React.FC = () => {
       try {
         setLoading(true);
         const response = await apiClient.post('/advice/recommendations');
-        setData(response.data);
+        
+        const rawAdvice = response.data.advice;
+        if (!rawAdvice) throw new Error("Invalid response format");
+        
+        const mappedData: AdviceResponse = {
+          analysis: {
+            highestEmissionSource: rawAdvice.topSources[0]?.category || 'Unknown',
+            insights: rawAdvice.topSources.map((s: any) => `${s.category} (${s.percentage}%): ${s.explanation}`)
+          },
+          recommendations: rawAdvice.strategies.map((s: any, idx: number) => ({
+            id: `rec-${idx}`,
+            title: s.title,
+            description: s.description,
+            impact: s.difficulty >= 4 ? 'High' : (s.difficulty >= 2 ? 'Medium' : 'Low'),
+            category: 'Tailored Strategy',
+            estimatedSavings: s.estimatedSavings
+          })),
+          weeklyChallenge: {
+            title: rawAdvice.weeklyChallenge.title,
+            description: rawAdvice.weeklyChallenge.description,
+            rewardPoints: 50
+          }
+        };
+        
+        setData(mappedData);
       } catch (err: any) {
         setError(err.response?.data?.error || 'Failed to load AI recommendations.');
       } finally {
