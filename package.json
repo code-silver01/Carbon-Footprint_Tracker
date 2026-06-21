@@ -1,0 +1,29 @@
+{
+  "name": "carbonwise-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-grade carbon footprint tracking application with AI-powered sustainability insights",
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build:server": "cd server && npm run build",
+    "build:client": "cd client && npm run build",
+    "build": "npm run build:server && npm run build:client",
+    "test:server": "cd server && npm test",
+    "test:client": "cd client && npm test",
+    "test": "npm run test:server && npm run test:client",
+    "lint:server": "cd server && npm run lint",
+    "lint:client": "cd client && npm run lint",
+    "lint": "npm run lint:server && npm run lint:client",
+    "type-check": "cd server && npx tsc --noEmit && cd ../client && npx tsc --noEmit",
+    "clean": "rimraf server/dist client/dist"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "rimraf": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

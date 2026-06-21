@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # Firestore Local Emulator
+  firestore-emulator:
+    image: google/cloud-sdk:emulators
+    command: gcloud beta emulators firestore start --host-port=0.0.0.0:8080
+    ports:
+      - "8080:8080"
+    environment:
+      - FIRESTORE_PROJECT_ID=carbonwise-dev
+
+  # Backend API
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - GOOGLE_CLOUD_PROJECT=carbonwise-dev
+      - FIRESTORE_EMULATOR_HOST=firestore-emulator:8080
+      - JWT_SECRET=dev-secret-super-long-string-123!
+      - JWT_REFRESH_SECRET=dev-refresh-super-long-string-123!
+      # GEMINI_API_KEY should be passed from host environment for local AI testing
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    depends_on:
+      - firestore-emulator
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "5173:8080"
+    environment:
+      - VITE_API_URL=http://localhost:3001/api
+    depends_on:
+      - server

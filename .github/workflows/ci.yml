@@ -1,0 +1,61 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies (Server)
+      working-directory: ./server
+      run: npm ci
+      
+    - name: Run ESLint (Server)
+      working-directory: ./server
+      run: npm run lint
+      
+    - name: Run Unit Tests (Server)
+      working-directory: ./server
+      run: npm test
+
+  build-and-deploy:
+    needs: test-and-lint
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    # Example placeholder for GCP auth
+    # - id: 'auth'
+    #   uses: 'google-github-actions/auth@v1'
+    #   with:
+    #     credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+        
+    # - name: 'Set up Cloud SDK'
+    #   uses: 'google-github-actions/setup-gcloud@v1'
+      
+    - name: Build Server Image
+      run: docker build -t carbonwise-server ./server
+      
+    - name: Build Client Image
+      run: docker build -t carbonwise-client ./client
+      
+    # Placeholder for pushing to Artifact Registry and deploying to Cloud Run
+    # - name: Push and Deploy
+    #   run: |
+    #     docker push gcr.io/MY_PROJECT/carbonwise-server
+    #     gcloud run deploy carbonwise-server --image gcr.io/MY_PROJECT/carbonwise-server --region us-central1

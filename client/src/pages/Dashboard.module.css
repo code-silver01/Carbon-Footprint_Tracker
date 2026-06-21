@@ -1,0 +1,242 @@
+.dashboardLayout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 280px;
+  height: calc(100vh - var(--spacing-8));
+  margin: var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-6);
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-8);
+}
+
+.logoIcon {
+  color: var(--color-primary);
+}
+
+.logo h2 {
+  font-size: 1.5rem;
+  background: linear-gradient(90deg, var(--color-text), var(--color-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  flex: 1;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+
+.navItem:hover {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-primary);
+}
+
+.navItem.active {
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.15), transparent);
+  color: var(--color-primary);
+  border-left: 3px solid var(--color-primary);
+}
+
+.sidebarFooter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--glass-border);
+}
+
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-md);
+  color: var(--color-danger);
+  background: none;
+  border: none;
+  font-weight: 500;
+  font-size: 1rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  text-align: left;
+}
+
+.logoutBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.mainContent {
+  flex: 1;
+  padding: var(--spacing-6) var(--spacing-8);
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-8);
+}
+
+.greeting {
+  font-size: 2.25rem;
+  margin-bottom: var(--spacing-1);
+}
+
+.subtitle {
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-info));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+}
+
+.widgetsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-6);
+}
+
+.widget {
+  padding: var(--spacing-6);
+  display: flex;
+  flex-direction: column;
+}
+
+.wideWidget {
+  grid-column: 1 / -1;
+}
+
+.widget h3 {
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-4);
+}
+
+.scoreWidget {
+  align-items: center;
+  text-align: center;
+}
+
+.scoreCircle {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 8px solid var(--color-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-4);
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.2), inset 0 0 20px rgba(16, 185, 129, 0.1);
+}
+
+.scoreNumber {
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  line-height: 1;
+  color: var(--color-text);
+}
+
+.scoreLabel {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.statValue {
+  font-size: 3rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-2);
+}
+
+.trendText {
+  color: var(--color-success);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.milestoneContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.milestoneIcon {
+  width: 48px;
+  height: 48px;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-primary);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.milestoneText {
+  flex: 1;
+}
+
+.milestoneText h4 {
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-1);
+}
+
+.milestoneText p {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+.actionBtn {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.actionBtn:hover {
+  background: var(--color-primary);
+  color: white;
+}
