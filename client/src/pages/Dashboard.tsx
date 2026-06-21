@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import styles from './Dashboard.module.css';
 import { apiClient } from '../api/apiClient';
+import { TrendChart } from '../components/Dashboard/TrendChart';
 
 
 interface UserStats { currentMonth: number; cumulative: number; sustainabilityScore: number; rank: number; }
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuth();
+  const [data, setData] = useState<{ month: string; savings: number; }[]>([]);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -17,6 +19,7 @@ export const Dashboard: React.FC = () => {
         const response = await apiClient.get('/progress');
         const progressData = response.data;
         if (progressData) {
+          setData(progressData.monthlyData || []);
           setStats({
             currentMonth: progressData.currentMonth || 0,
             cumulative: progressData.cumulative || 0,
@@ -59,6 +62,11 @@ export const Dashboard: React.FC = () => {
             <p className={styles.value}>{stats?.sustainabilityScore || 0}/100</p>
           </div>
         </div>
+      </section>
+
+      <section className={styles.metrics} aria-labelledby="chart-heading" style={{ marginTop: '2rem' }}>
+        <h2 id="chart-heading">Monthly Trend</h2>
+        <TrendChart data={data} />
       </section>
     </main>
   );

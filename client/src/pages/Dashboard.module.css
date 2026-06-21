@@ -1,10 +1,11 @@
-.dashboard { padding: 2rem; max-width: 1200px; margin: 0 auto; color: var(--text-primary); }
+.dashboard { padding: 2rem; max-width: 1200px; margin: 0 auto; color: var(--color-text); }
 .header { margin-bottom: 2rem; }
-.header h1 { font-size: 2rem; font-weight: 700; }
-.header p { color: var(--text-secondary); font-size: 1.1rem; }
+.header h1 { font-size: 2.5rem; font-weight: 700; background: linear-gradient(135deg, var(--color-primary-light), var(--color-info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.header p { color: var(--color-text-muted); font-size: 1.1rem; margin-top: 0.5rem; }
 .metrics { margin-bottom: 3rem; }
 .metricGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
-.card { background: var(--bg-glass); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; }
-.card h3 { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
-.value { font-size: 2rem; font-weight: 700; color: var(--primary-color); }
-.loader { display: flex; justify-content: center; align-items: center; min-height: 50vh; font-size: 1.2rem; color: var(--text-secondary); }
+.card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; backdrop-filter: blur(12px); box-shadow: var(--glass-shadow); transition: transform 0.3s ease; }
+.card:hover { transform: translateY(-5px); }
+.card h3 { font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+.value { font-size: 2.5rem; font-weight: 700; color: var(--color-primary); }
+.loader { display: flex; justify-content: center; align-items: center; min-height: 50vh; font-size: 1.2rem; color: var(--color-text-muted); }
