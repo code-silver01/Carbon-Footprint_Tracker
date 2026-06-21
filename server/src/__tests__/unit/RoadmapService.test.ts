@@ -1,4 +1,4 @@
-import { RoadmapService, DEFAULT_STRATEGIES } from '../../domain/services/RoadmapService';
+import { RoadmapService, MilestoneCalculator, StrategyAllocator, DEFAULT_STRATEGIES } from '../../domain/services/roadmap';
 import { IRoadmapRepository } from '../../domain/repositories/IRoadmapRepository';
 import { CarbonFootprint } from '../../domain/entities/CarbonFootprint';
 import { ValidationError } from '../../domain/errors';
@@ -44,7 +44,7 @@ describe('RoadmapService', () => {
   beforeEach(() => {
     roadmapRepo = createMockRoadmapRepo();
     logger = createMockLogger();
-    service = new RoadmapService(roadmapRepo, logger);
+    service = new RoadmapService(roadmapRepo, new MilestoneCalculator(), new StrategyAllocator(), logger);
     footprint = createTestFootprint();
   });
 

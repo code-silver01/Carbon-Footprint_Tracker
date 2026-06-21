@@ -21,7 +21,7 @@ import { InMemoryCacheService } from '../infrastructure/cache/CacheService';
 import { AuthService, IPasswordHasher, ITokenService, AuthTokenPair, IRateLimiter } from '../domain/services/AuthService';
 import { EmissionsCalculator } from '../domain/services/EmissionsCalculator';
 import { SustainabilityAdvisor, IGeminiService } from '../domain/services/SustainabilityAdvisor';
-import { RoadmapService } from '../domain/services/RoadmapService';
+import { RoadmapService, MilestoneCalculator, StrategyAllocator } from '../domain/services/roadmap';
 import { ProgressTracker } from '../domain/services/ProgressTracker';
 
 // Controllers
@@ -191,7 +191,14 @@ export function createContainer(config: AppConfig): AppContainer {
     logger,
   );
 
-  const roadmapService = new RoadmapService(roadmapRepository, logger);
+  const milestoneCalculator = new MilestoneCalculator();
+  const strategyAllocator = new StrategyAllocator();
+  const roadmapService = new RoadmapService(
+    roadmapRepository,
+    milestoneCalculator,
+    strategyAllocator,
+    logger,
+  );
 
   const progressTracker = new ProgressTracker(
     footprintRepository,

@@ -39,23 +39,32 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    # Example placeholder for GCP auth
-    # - id: 'auth'
-    #   uses: 'google-github-actions/auth@v1'
-    #   with:
-    #     credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
         
-    # - name: 'Set up Cloud SDK'
-    #   uses: 'google-github-actions/setup-gcloud@v1'
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v1'
       
     - name: Build Server Image
-      run: docker build -t carbonwise-server ./server
+      run: docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/carbonwise-repo/server:${{ github.sha }} ./server
       
     - name: Build Client Image
-      run: docker build -t carbonwise-client ./client
+      run: docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/carbonwise-repo/client:${{ github.sha }} ./client
       
-    # Placeholder for pushing to Artifact Registry and deploying to Cloud Run
-    # - name: Push and Deploy
-    #   run: |
-    #     docker push gcr.io/MY_PROJECT/carbonwise-server
-    #     gcloud run deploy carbonwise-server --image gcr.io/MY_PROJECT/carbonwise-server --region us-central1
+    - name: Configure Docker for Artifact Registry
+      run: gcloud auth configure-docker us-central1-docker.pkg.dev
+      
+    - name: Push Images
+      run: |
+        docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/carbonwise-repo/server:${{ github.sha }}
+        docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/carbonwise-repo/client:${{ github.sha }}
+        
+    - name: Deploy Server to Cloud Run
+      run: |
+        gcloud run deploy carbonwise-server \
+          --image us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/carbonwise-repo/server:${{ github.sha }} \
+          --region us-central1 \
+          --platform managed \
+          --allow-unauthenticated

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Leaf, LogIn, UserPlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { apiClient } from '../api/apiClient';
+import FormField from '../components/common/FormField';
 import styles from './Login.module.css';
 
 const Login: React.FC = () => {
@@ -14,6 +15,8 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const emailRef = React.useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +37,8 @@ const Login: React.FC = () => {
       } else {
         setError(data?.error || 'Authentication failed');
       }
+      // Focus the first input on error for accessibility
+      emailRef.current?.focus();
     } finally {
       setLoading(false);
     }
@@ -70,34 +75,27 @@ const Login: React.FC = () => {
             </motion.div>
           )}
 
-          <div className={styles.inputGroup}>
-            <label htmlFor="email">Email</label>
-            <input 
-              type="email" 
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              required 
-            />
-          </div>
+          <FormField
+            ref={emailRef}
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            required
+            autoComplete="email"
+          />
 
-          <div className={styles.inputGroup}>
-            <label htmlFor="password">Password</label>
-            <input 
-              type="password" 
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required 
-            />
-            {!isLogin && (
-              <span className={styles.passwordHint}>
-                Must be at least 12 chars, include uppercase, number, and symbol.
-              </span>
-            )}
-          </div>
+          <FormField
+            label="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            required
+            autoComplete={isLogin ? "current-password" : "new-password"}
+            hint={!isLogin ? "Must be at least 12 chars, include uppercase, number, and symbol." : undefined}
+          />
 
           <motion.button 
             type="submit" 

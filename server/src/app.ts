@@ -30,9 +30,29 @@ export function createApp(container: AppContainer, config: AppConfig): Express {
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         imgSrc: ["'self'", 'data:', 'https:'],
+        fontSrc: ["'self'"],
+        connectSrc: ["'self'", 'https:'],
+        frameSrc: ["'none'"],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+        frameAncestors: ["'none'"],
       },
+      reportOnly: false,
     },
     crossOriginEmbedderPolicy: false,
+    // Strict Transport Security: force HTTPS for 1 year
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+    // Prevent MIME-type sniffing
+    noSniff: true,
+    // Prevent clickjacking
+    frameguard: { action: 'deny' },
+    // Strict referrer policy
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   }));
 
   app.use(cors({
