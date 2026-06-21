@@ -1,8 +1,8 @@
-import { RoadmapService, MilestoneCalculator, StrategyAllocator, DEFAULT_STRATEGIES } from '../../domain/services/roadmap';
-import { IRoadmapRepository } from '../../domain/repositories/IRoadmapRepository';
-import { CarbonFootprint } from '../../domain/entities/CarbonFootprint';
-import { ValidationError } from '../../domain/errors';
-import { ILogger } from '../../domain/services/AuthService';
+import { RoadmapService, MilestoneCalculator, StrategyAllocator, DEFAULT_STRATEGIES } from '../../../domain/services/roadmap';
+import { IRoadmapRepository } from '../../../domain/repositories/IRoadmapRepository';
+import { CarbonFootprint } from '../../../domain/entities/CarbonFootprint';
+import { ValidationError } from '../../../domain/errors';
+import { ILogger } from '../../../domain/services/AuthService';
 
 function createMockRoadmapRepo(): jest.Mocked<IRoadmapRepository> {
   return {

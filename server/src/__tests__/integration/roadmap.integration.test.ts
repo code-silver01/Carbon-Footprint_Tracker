@@ -7,7 +7,6 @@ import { Express } from 'express';
 describe('Roadmaps API (Integration)', () => {
   let app: Express;
   let accessToken: string;
-  let footprintId: string;
 
   beforeAll(async () => {
     const config = loadConfig();
@@ -23,16 +22,16 @@ describe('Roadmaps API (Integration)', () => {
 
     // Create a footprint first
     const fpResponse = await request(app)
-      .post('/api/footprints')
+      .post('/api/footprints/calculate')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        transportation: { carMiles: 500, bikeMiles: 0, transitMiles: 100, flightHours: 2 },
-        energy: { electricityKwh: 300, renewablePercentage: 25 },
+        transportation: { carMiles: 500, flightHours: 0, transitMiles: 0, bikeMiles: 0 },
+        energy: { electricityKwh: 300, renewablePercentage: 0 },
         dietType: 'mixed',
         shopping: { monthlySpend: 500, fastFashionFrequency: 2 },
       });
       
-    footprintId = fpResponse.body.id;
+    expect(fpResponse.status).toBe(201);
   });
 
   describe('POST /api/roadmaps/generate', () => {
