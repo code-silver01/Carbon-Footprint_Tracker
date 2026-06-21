@@ -1,0 +1,36 @@
+.container { padding: 2rem; max-width: 800px; margin: 0 auto; color: var(--color-text); }
+.header { margin-bottom: 3rem; }
+.titleWrapper { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+.icon { color: var(--color-primary-light); }
+.header h1 { font-size: 2.5rem; background: linear-gradient(135deg, var(--color-primary-light), var(--color-info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.header p { color: var(--color-text-muted); font-size: 1.1rem; }
+
+.emptyState { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; gap: 1.5rem; }
+.emptyIcon { color: var(--color-text-muted); opacity: 0.5; }
+.emptyState h2 { font-size: 2rem; }
+.emptyState p { color: var(--color-text-muted); max-width: 400px; line-height: 1.6; }
+.errorText { color: var(--color-danger); margin-top: 1rem; }
+
+.timeline { position: relative; margin-top: 2rem; padding-left: 1rem; }
+.timeline::before { content: ''; position: absolute; left: 24px; top: 0; bottom: 0; width: 2px; background: var(--glass-border); }
+
+.timelineItem { position: relative; display: flex; gap: 2rem; margin-bottom: 3rem; }
+.statusIndicator { position: relative; z-index: 2; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--color-surface); border: 2px solid var(--glass-border); flex-shrink: 0; }
+.statusIndicator.completed { background: rgba(16, 185, 129, 0.2); border-color: var(--color-success); color: var(--color-success); }
+.statusIndicator.in_progress { background: rgba(59, 130, 246, 0.2); border-color: var(--color-info); color: var(--color-info); }
+.statusIndicator.pending { background: var(--color-surface-hover); color: var(--color-text-muted); }
+
+.milestoneContent { background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 1.5rem; border-radius: 12px; backdrop-filter: blur(12px); box-shadow: var(--glass-shadow); flex-grow: 1; }
+.milestoneHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.75rem; }
+.milestoneHeader h3 { font-size: 1.25rem; }
+.targetDate { font-size: 0.85rem; color: var(--color-text-muted); font-weight: 500; }
+.milestoneContent p { color: var(--color-text-muted); line-height: 1.6; margin-bottom: 1.5rem; }
+
+.actions { display: flex; gap: 1rem; }
+.completeBtn { padding: 0.5rem 1rem; background: var(--color-success); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+.completeBtn:hover { opacity: 0.9; }
+.startBtn { padding: 0.5rem 1rem; background: transparent; color: var(--color-info); border: 1px solid var(--color-info); border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.startBtn:hover { background: rgba(59, 130, 246, 0.1); }
+
+.loader { display: flex; justify-content: center; align-items: center; min-height: 50vh; font-size: 1.2rem; color: var(--color-primary-light); animation: pulse 2s infinite; }
+@keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }

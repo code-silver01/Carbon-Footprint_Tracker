@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Leaf, LayoutDashboard, Calculator, LogOut } from 'lucide-react';
+import { Leaf, LayoutDashboard, Calculator, LogOut, Brain, Target } from 'lucide-react';
 import styles from './Navbar.module.css';
 
 export const Navbar: React.FC = () => {
@@ -23,6 +23,14 @@ export const Navbar: React.FC = () => {
         <NavLink to="/calculator" className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}>
           <Calculator size={20} />
           <span>Calculator</span>
+        </NavLink>
+        <NavLink to="/advisor" className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}>
+          <Brain size={20} />
+          <span>AI Advisor</span>
+        </NavLink>
+        <NavLink to="/roadmaps" className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}>
+          <Target size={20} />
+          <span>Roadmaps</span>
         </NavLink>
         <button onClick={logout} className={styles.logoutBtn}>
           <LogOut size={20} />

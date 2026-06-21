@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import styles from './Dashboard.module.css';
 import { apiClient } from '../api/apiClient';
 import { TrendChart } from '../components/Dashboard/TrendChart';
+import { LeaderboardCard } from '../components/Dashboard/LeaderboardCard';
 
 
 interface UserStats { currentMonth: number; cumulative: number; sustainabilityScore: number; rank: number; }
@@ -57,17 +58,20 @@ export const Dashboard: React.FC = () => {
             <h3>Cumulative Savings</h3>
             <p className={styles.value}>{stats?.cumulative?.toFixed(1) || 0} kg CO₂</p>
           </div>
-          <div className={styles.card} aria-label={`Your sustainability score is ${stats?.sustainabilityScore || 0} out of 100`}>
-            <h3>Sustainability Score</h3>
-            <p className={styles.value}>{stats?.sustainabilityScore || 0}/100</p>
-          </div>
         </div>
       </section>
 
-      <section className={styles.metrics} aria-labelledby="chart-heading" style={{ marginTop: '2rem' }}>
-        <h2 id="chart-heading">Monthly Trend</h2>
-        <TrendChart data={data} />
-      </section>
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem', marginTop: '2rem' }}>
+        <section className={styles.metrics} aria-labelledby="chart-heading">
+          <h2 id="chart-heading">Monthly Trend</h2>
+          <TrendChart data={data} />
+        </section>
+
+        <section className={styles.leaderboard} aria-labelledby="leaderboard-heading">
+          <h2 id="leaderboard-heading" style={{ marginBottom: '1rem', fontSize: '1.5rem', fontWeight: 600 }}>Community Leaderboard</h2>
+          <LeaderboardCard rank={stats?.rank || 9999} score={stats?.sustainabilityScore || 0} />
+        </section>
+      </div>
     </main>
   );
 };

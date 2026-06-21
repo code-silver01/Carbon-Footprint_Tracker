@@ -7,8 +7,10 @@ import { Navbar } from './components/common/Navbar';
 
 // Lazy load pages for performance
 const Login = React.lazy(() => import('./pages/Login'));
-const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const Dashboard = React.lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
 const Calculator = React.lazy(() => import('./pages/Calculator').then(m => ({ default: m.CarbonCalculator })));
+const Advisor = React.lazy(() => import('./pages/Advisor').then(m => ({ default: m.Advisor })));
+const Roadmaps = React.lazy(() => import('./pages/Roadmaps').then(m => ({ default: m.Roadmaps })));
 
 const ProtectedLayout: React.FC = () => (
   <>
@@ -29,6 +31,8 @@ const App: React.FC = () => {
             <Route element={<ProtectedLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/calculator" element={<Calculator />} />
+              <Route path="/advisor" element={<Advisor />} />
+              <Route path="/roadmaps" element={<Roadmaps />} />
             </Route>
 
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
