@@ -3,12 +3,11 @@ import { useAuth } from '../context/AuthContext';
 import styles from './Dashboard.module.css';
 import { apiClient } from '../api/apiClient';
 
-interface MonthlyProgress { month: string; savings: number; }
+
 interface UserStats { currentMonth: number; cumulative: number; sustainabilityScore: number; rank: number; }
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuth();
-  const [data, setData] = useState<MonthlyProgress[]>([]);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -18,7 +17,6 @@ export const Dashboard: React.FC = () => {
         const response = await apiClient.get('/progress');
         const progressData = response.data;
         if (progressData) {
-          setData(progressData.monthlyData || []);
           setStats({
             currentMonth: progressData.currentMonth || 0,
             cumulative: progressData.cumulative || 0,

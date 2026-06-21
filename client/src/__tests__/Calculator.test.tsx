@@ -1,8 +1,9 @@
-import React from 'react';
+
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CarbonCalculator } from '../pages/Calculator';
 import '@testing-library/jest-dom';
+import { describe, it, expect, vi } from 'vitest';
 
 describe('CarbonCalculator Accessibility', () => {
   it('should render with proper semantic structure', () => {
@@ -53,9 +54,9 @@ describe('CarbonCalculator Accessibility', () => {
     await user.clear(carMilesInput);
     await user.type(carMilesInput, '500');
 
-    global.fetch = jest.fn(() =>
+    window.fetch = vi.fn(() =>
       Promise.resolve({ ok: true, json: () => Promise.resolve({ total: 250 }) })
-    ) as jest.Mock;
+    ) as any;
 
     const submitButton = screen.getByRole('button', { name: /calculate/i });
     await user.click(submitButton);

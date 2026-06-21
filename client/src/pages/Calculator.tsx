@@ -27,7 +27,7 @@ export const CarbonCalculator: React.FC = () => {
     setErrors({});
 
     try {
-      const response = await apiClient.post('/footprints', state);
+      await apiClient.post('/footprints', state);
 
       const message = 'Carbon footprint calculated successfully';
       const announcement = document.createElement('div');
